@@ -50,7 +50,9 @@ persistent nsfe;
     end;
     try
         if ~tadf
-            result = scan(yaml.load(fileread([filename, fileext])));
+            result = fileread([filename, fileext]);
+            result = replace(result, '!degrees', '');
+            result = scan(yaml.load(result));
         else
             result = scan(yaml.load(inputfilename));
         end;
