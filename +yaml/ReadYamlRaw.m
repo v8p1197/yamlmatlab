@@ -51,7 +51,19 @@ persistent nsfe;
     try
         if ~tadf
             result = fileread([filename, fileext]);
-            result = replace(result, '!degrees', '');
+            
+            % Apply !degrees command, convert degrees values to radians
+            mathPattern = asManyOfPattern(digitsPattern | characterListPattern("+-."), 1);
+            mathPattern = asManyOfPattern(mathPattern) + mathPattern;
+            degrees_pattern = '!degrees' + whitespacePattern + mathPattern;
+            degrees_pattern = extract(result, degrees_pattern);
+            for ii = 1 : length(degrees_pattern)
+                pattern = degrees_pattern{ii};
+                degrees_value = extract(pattern, mathPattern);
+                degrees_value = str2double(degrees_value{1});
+                result = replace(result, pattern, num2str(deg2rad(degrees_value)));
+            end
+
             result = scan(yaml.load(result));
         else
             result = scan(yaml.load(inputfilename));
